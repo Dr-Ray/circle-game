@@ -1,0 +1,265 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .game {
+            width: 800px;
+            height: 800px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <div class="r-app">
+        <div class="game">
+            <canvas id="canvas" width="800" height="800"></canvas>
+        </div>
+    </div>
+    <script>
+        let canvas = document.querySelector('#canvas');
+        let ctx = canvas.getContext('2d');
+        const size = 800;
+        const center = size/2;
+        const radius = size * 0.44;
+
+        class gameCircle{
+            constructor({position,radius,color}) {
+                this.position = position;
+                this.radius = radius;
+                this.color = color;
+            }
+
+            drawCircle(ctx,fillmode) {
+               
+                if(fillmode) {
+                    let cangle = 0;
+                    let pa = 0.25*2*Math.PI;
+                    for(let j = 0;j<4;j++) {
+                        ctx.beginPath();
+                        ctx.arc(400,400,this.radius,cangle,cangle + pa);
+                        cangle +=pa;
+                        ctx.lineTo(400,400)
+                        ctx.stroke();
+                        ctx.fillStyle = this.color[j+1];
+                        ctx.fill()
+                    }
+                }else{
+                    ctx.beginPath();
+                    ctx.arc(400,400,this.radius,0,2*Math.PI);
+                    ctx.stroke();
+                    ctx.fillStyle = this.color[0];
+                    ctx.fill();
+                }
+            }
+        }
+
+        class miniCircles{
+            constructor({radius,circles,dfang,colors}) {
+                this.radius = radius;
+                this.numcircles = circles;
+                this.difAng = dfang;
+                this.color = colors;
+                console.log(this.color)
+            }
+            drawMiniCircle(ctx,i) {
+                var ang,num,it = 0,cl=["green","blue","red","yellow"];
+                let cangle = 0;
+                let pa = Math.PI;
+
+                if(i == 1) {
+                    for(num = 0; num < this.numcircles; num++){
+                        ang = num *this.difAng;
+                        if(num == 0 || num == 5 || num == 10 || num == 15) {
+                            ctx.rotate(ang);
+                            ctx.translate(0, -this.radius*0.85);
+                            ctx.rotate(-ang);
+
+                            ctx.beginPath();
+                            ctx.arc(0, 0, 28, cangle,cangle + pa);
+                            cangle +=pa;
+                            ctx.stroke();
+
+                            ctx.beginPath();
+                            ctx.arc(0, 0, 28, cangle,cangle + pa);
+                            cangle +=pa;
+                            ctx.lineTo(28,0)
+                            ctx.stroke();
+
+                            ctx.rotate(ang);
+                            ctx.translate(0, this.radius*0.85);
+                            ctx.rotate(-ang);
+                            ctx.fillStyle = cl[it];
+                            ctx.fill()
+                        }
+                        else{
+                            ctx.rotate(ang);
+                            ctx.translate(0, -this.radius*0.85);
+                            ctx.rotate(-ang);
+
+                            ctx.beginPath();
+                            ctx.arc(0, 0, 28, 0, 2*Math.PI);
+                            ctx.stroke();
+
+                            ctx.rotate(ang);
+                            ctx.translate(0, this.radius*0.85);
+                            ctx.rotate(-ang);
+                            ctx.fillStyle = cl[it];
+                            ctx.fill()
+                        }
+                        
+                        if(((num+1) % 5 == 0)) {
+                            it++;
+                        }                       
+                        
+                    }
+                }else{
+                    for(num = 0; num < this.numcircles; num++){
+                    
+                        ang = num *this.difAng;
+
+                        ctx.rotate(ang);
+                        ctx.translate(0, -this.radius*0.85);
+                        ctx.rotate(-ang);
+
+                        ctx.beginPath();
+                        ctx.arc(0, 0, 28, 0, 2*Math.PI);
+                        ctx.stroke();
+
+                        ctx.rotate(ang);
+                        ctx.translate(0, this.radius*0.85);
+                        ctx.rotate(-ang);
+                        ctx.fillStyle = "white";
+                        ctx.fill()
+                    }
+                }
+            }
+        }
+
+        let gc = [];
+
+        let r = [radius, radius - 45, radius - 180, radius - 240];
+        
+        let ccls = [28, 20, 16];
+        let angs = [(17* Math.PI / 239), (Math.PI / 10), (Math.PI / 8)];
+        let clrs = ["green","white","blue","yellow"];
+
+        let Cclrs = [
+            ["white","yellow","green","blue","red"],
+            ["white"],
+            ["white","yellow","green","blue","red"],
+            ["white","blue","red","yellow","green"]
+        ];
+
+        let mode = [true,false,true,true];
+        let cangle = 0;  
+
+        for(let i=0;i<4;i++) {
+            gc.push(new gameCircle({
+                position:{ x:center, y:center },
+                radius:r[i], color:Cclrs[i]
+            }));
+        }
+        let mc = [];
+        var radiuss = canvas.height / 2;
+        radiuss = radiuss * 0.90;
+
+        let mr = [radiuss + 10, radiuss - 55, radiuss - 120];
+
+        for(let i=0;i<3;i++) {
+            mc.push(new miniCircles({
+                radius:mr[i],
+                circles:ccls[i],
+                dfang:angs[i],
+                colors:Cclrs[i],
+                cnagle:(i+1)*0.5*Math.PI
+            }));
+        }
+
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+
+            ctx.save()
+            ctx.fillStyle = "yellow";
+            ctx.beginPath()
+            ctx.moveTo(0,0);
+            ctx.lineTo(235,0)
+            ctx.moveTo(235,0);
+            ctx.lineTo(0,235);
+            ctx.moveTo(0,235);
+            ctx.lineTo(0,0)
+            ctx.lineTo(235,0)
+            ctx.fill()
+            ctx.restore()
+
+            ctx.save()
+            ctx.fillStyle = "green";
+            ctx.beginPath()
+            ctx.moveTo(800,0);
+            ctx.lineTo(565,0)
+            ctx.moveTo(565,0);
+            ctx.lineTo(800,235)
+            ctx.moveTo(800,235)
+            ctx.lineTo(800,0)
+            ctx.lineTo(565,0)
+            ctx.fill()
+            ctx.restore()
+
+            ctx.save()
+            ctx.fillStyle = "red";
+            ctx.beginPath()
+            ctx.moveTo(0,800);
+            ctx.lineTo(235,800)
+            ctx.moveTo(235,800);
+            ctx.lineTo(0,565);
+            ctx.moveTo(0,565);
+            ctx.lineTo(0,800)
+            ctx.lineTo(235,800)
+            ctx.fill()
+            ctx.restore()
+
+            ctx.save()
+            ctx.fillStyle = "blue";
+            ctx.beginPath()
+            ctx.moveTo(800,800);
+            ctx.lineTo(565,800)
+            ctx.moveTo(565,800);
+            ctx.lineTo(800,565);
+            ctx.moveTo(800,565);
+            ctx.lineTo(800,800)
+            ctx.lineTo(565,800)
+            ctx.fill()
+            ctx.restore()
+
+            ctx.save()
+            ctx.beginPath()
+            ctx.arc(center,center,center,0,2*Math.PI)
+            ctx.stroke()
+            ctx.restore()
+
+            ctx.save()
+            ctx.rotate(.8)
+            ctx.translate(160,-407)
+            gc[0].drawCircle(ctx,mode[0]);
+            gc[1].drawCircle(ctx,mode[1]);
+            gc[2].drawCircle(ctx,mode[2]);
+            gc[3].drawCircle(ctx,mode[3]);
+            ctx.restore()
+
+            ctx.save()
+            // ctx.rotate(.8)
+            ctx.translate(396,396);
+            mc[0].drawMiniCircle(ctx,0);
+            mc[1].drawMiniCircle(ctx,1);
+            mc[2].drawMiniCircle(ctx,2);
+            ctx.restore()
+
+            
+            requestAnimationFrame(animate)
+        }
+        animate()
+    </script>
+</body>
+</html>
